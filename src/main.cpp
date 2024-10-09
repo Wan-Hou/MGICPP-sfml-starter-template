@@ -37,9 +37,29 @@ int main()
     //'process inputs' element of the game loop
     while (window.pollEvent(event))
     {
+      // mouse press event
+      if (event.type == sf::Event::MouseButtonPressed)
+      {
+        game.mouseClicked(event);
+      }
+
+      // key press event
+      if (event.type == sf::Event::KeyPressed)
+      {
+        game.keyPressed(event);
+      }
+
       // "close requested" event: we close the window
       if (event.type == sf::Event::Closed)
+      {
         window.close();
+      }
+
+      // "resize requested" event: force the window to stay the same size
+      if (event.type == sf::Event::Resized)
+      {
+        window.setSize(sf::Vector2u(1080, 720));
+      }
     }
 
 

@@ -17,8 +17,13 @@ class Game
   void initDisplay();
   void update(float dt);
   void render();
+  void mouseHover();
   void mouseClicked(sf::Event event);
   void keyPressed(sf::Event event);
+  void birdMovement(float dt);
+  bool collisionCheck(sf::Vector2f click, sf::Sprite sprite);
+  void spawn();
+  void screen(AllScreenStates swap);
 
  private:
   sf::RenderWindow& window;
@@ -28,17 +33,21 @@ class Game
   sf::Texture bird_texture;
   sf::Font font_open_sans;
 
+  AllScreenStates screen_state = AllScreenStates::In_Menu;
+  AllScreenStates menu_selection = AllScreenStates::In_Menu;
+
   sf::Text score_text;
-  sf::Text selector;
   sf::Text menu_text;
   sf::Text title_text;
   sf::Text play_option;
   sf::Text settings_option;
   sf::Text quit_option;
-  sf::Text settings_text;
-  sf::Text settings_mode_1;
-  sf::Text settings_mode_2;
-  sf::Text settings_exit;
+
+  bool reverse = false;
+  float speed = 200;
+
+  int menu_integer = 0;
+  unsigned int score = 0;
 
 };
 
