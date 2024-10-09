@@ -1,10 +1,9 @@
 
-#ifndef PLATFORMER_GAME_H
-#define PLATFORMER_GAME_H
+#ifndef WHACKY_GAME_H
+#define WHACKY_GAME_H
 
-#include <iostream>
-#include <SFML/Graphics.hpp>
 #include "Functions.h"
+#include "GameObject.h"
 
 class Game
 {
@@ -21,20 +20,20 @@ class Game
   void mouseClicked(sf::Event event);
   void keyPressed(sf::Event event);
   void birdMovement(float dt);
-  bool collisionCheck(sf::Vector2f click, sf::Sprite sprite);
+  bool collisionCheck(sf::Vector2f click, GameObject gameobject);
+  bool birdCollisionCheck(sf::Vector2f click, Bird bird);
   void spawn();
   void screen(AllScreenStates swap);
 
  private:
   sf::RenderWindow& window;
-  sf::Sprite background;
-  sf::Texture background_texture;
-  sf::Sprite bird;
-  sf::Texture bird_texture;
+  GameObject background;
+  Bird bird;
   sf::Font font_open_sans;
 
   AllScreenStates screen_state = AllScreenStates::In_Menu;
   AllScreenStates menu_selection = AllScreenStates::In_Menu;
+  AllGameModes game_mode = AllGameModes::Bird;
 
   sf::Text score_text;
   sf::Text menu_text;
@@ -44,11 +43,9 @@ class Game
   sf::Text quit_option;
 
   bool reverse = false;
-  float speed = 200;
 
-  int menu_integer = 0;
   unsigned int score = 0;
 
 };
 
-#endif // PLATFORMER_GAME_H
+#endif // WHACKY_GAME_H

@@ -22,19 +22,18 @@ bool Game::init()
 
 void Game::initObject()
 {
-	if(!background_texture.loadFromFile("../Data/WhackaMole Worksheet/background.png"))
+	if (!background.initialiseSprite("../Data/WhackaMole Worksheet/background.png"))
 	{
 		std::cout << "background texture did not load \n";
 	}
-	background.setTexture(background_texture);
 
-	if (!bird_texture.loadFromFile("../Data/WhackaMole Worksheet/bird.png"))
+	if (!bird.initialiseSprite("../Data/WhackaMole Worksheet/bird.png"))
 	{
 		std::cout << "bird texture did not load \n";
 	}
-	bird.setTexture(bird_texture);
-	bird.setPosition(100, 100);
-	bird.setScale(0.5,0.5);
+
+	bird.getSprite()->setPosition(100, 100);
+	bird.getSprite()->setScale(0.5,0.5);
 }
 
 void Game::initFont()
@@ -138,15 +137,15 @@ void Game::render()
 		}
 		case AllScreenStates::In_Game:
 		{
-			window.draw(background);
+			window.draw(*background.getSprite());
 			window.draw(score_text);
 			window.draw(title_text);
-			window.draw(bird);
+			window.draw(*bird.getSprite());
 			break;
 		}
 		case AllScreenStates::In_End:
 		{
-			window.draw(background);
+			window.draw(*background.getSprite());
 			break;
 		}
 		default:
@@ -449,27 +448,65 @@ void Game::keyPressed(sf::Event event)
 
 }
 
-bool Game::collisionCheck(sf::Vector2f click, sf::Sprite sprite)
+bool Game::collisionCheck(sf::Vector2f click, GameObject gameobject)
 {
-	if (click.x >= sprite.getPosition().x &&
-		click.x <= sprite.getPosition().x + sprite.getGlobalBounds().width)
+	float sprite_data[] =
 	{
-		if (click.y >= sprite.getPosition().y &&
-			click.y <= sprite.getPosition().y + sprite.getGlobalBounds().height)
+	  gameobject.getSprite()->getPosition().x,
+	  gameobject.getSprite()->getPosition().y,
+	  gameobject.getSprite()->getPosition().y +
+		  gameobject.getSprite()->getGlobalBounds().width,
+	  gameobject.getSprite()->getPosition().y +
+		  gameobject.getSprite()->getGlobalBounds().height
+	};
+
+	if (click.x >= sprite_data[0] && click.x <= sprite_data[2] && 
+		click.y >= sprite_data[1] && click.y <= sprite_data[3])
+	{
+		score++;
+		score_text.setString(std::to_string(score));
+		float confirm = std::log10(score) - static_cast<int>(std::log10(score));
+		if (confirm == 0)
 		{
-			score++;
-			score_text.setString(std::to_string(score));
-			float confirm = std::log10(score) - static_cast<int>(std::log10(score));
-			if (confirm == 0)
-			{
-				score_text.setPosition
-				(
-					window.getSize().x - 50 - std::log10(score) * 25,
-					score_text.getGlobalBounds().height / 2
-				);
-			}
-			return true;
+			score_text.setPosition
+			(
+				window.getSize().x - 50 - std::log10(score) * 25,
+				score_text.getGlobalBounds().height / 2
+			);
 		}
+		return true;
+	}
+	return false;
+
+}
+
+bool Game::birdCollisionCheck(sf::Vector2f click, Bird bird)
+{
+	float sprite_data[] =
+	{
+	  bird.getSprite()->getPosition().x,
+	  bird.getSprite()->getPosition().y,
+	  bird.getSprite()->getPosition().y +
+		  bird.getSprite()->getGlobalBounds().width,
+	  bird.getSprite()->getPosition().y +
+		  bird.getSprite()->getGlobalBounds().height
+	};
+
+	if (click.x >= sprite_data[0] && click.x <= sprite_data[2] &&
+		click.y >= sprite_data[1] && click.y <= sprite_data[3])
+	{
+		score++;
+		score_text.setString(std::to_string(score));
+		float confirm = std::log10(score) - static_cast<int>(std::log10(score));
+		if (confirm == 0)
+		{
+			score_text.setPosition
+			(
+				window.getSize().x - 50 - std::log10(score) * 25,
+				score_text.getGlobalBounds().height / 2
+			);
+		}
+		return true;
 	}
 	return false;
 
@@ -479,34 +516,34 @@ void Game::birdMovement(float dt)
 {
 	if (reverse)
 	{
-		bird.move(1.0f * speed * dt, 0);
-		bird.setTextureRect
+		bird.getSprite()->move(bird.getSpeed() * dt, 0);
+		bird.getSprite()->setTextureRect
 		(
 			sf::IntRect
 			(
 				0, 0,
-				bird.getLocalBounds().width,
-				bird.getLocalBounds().height
+				bird.getSprite()->getLocalBounds().width,
+				bird.getSprite()->getLocalBounds().height
 			)
 		);
 	}
 	else
 	{
-		bird.move(-1.0f * speed * dt, 0);
-		bird.setTextureRect
+		bird.getSprite()->move(bird.getSpeed() * -dt, 0);
+		bird.getSprite()->setTextureRect
 		(
 			sf::IntRect
 			(
-				bird.getLocalBounds().width, 0,
-				-bird.getLocalBounds().width,
-				bird.getLocalBounds().height
+				bird.getSprite()->getLocalBounds().width, 0,
+				-bird.getSprite()->getLocalBounds().width,
+				bird.getSprite()->getLocalBounds().height
 			)
 		);
 	}
 
-	if ((bird.getPosition().x >
-		(window.getSize().x - bird.getGlobalBounds().width)) ||
-		(bird.getPosition().x < 0))
+	if ((bird.getSprite()->getPosition().x >
+		(window.getSize().x - bird.getSprite()->getGlobalBounds().width)) ||
+		(bird.getSprite()->getPosition().x < 0))
 	{
 		reverse = !reverse;
 	}
@@ -514,13 +551,13 @@ void Game::birdMovement(float dt)
 
 void Game::spawn()
 {
-	bird.setPosition
+	bird.getSprite()->setPosition
 	(
-		RNGF(0, static_cast<float>(window.getSize().x) - bird.getGlobalBounds().width),
-		RNGF(0, static_cast<float>(window.getSize().y) - bird.getGlobalBounds().height)
+		RNGF(0, static_cast<float>(window.getSize().x) - bird.getSprite()->getGlobalBounds().width),
+		RNGF(0, static_cast<float>(window.getSize().y) - bird.getSprite()->getGlobalBounds().height)
 	);
 	reverse = RNGI(0, 1);
-	speed = RNGF(100, 1000);
+	bird.setSpeed(RNGF(100, 1000));
 	
 }
 
@@ -530,6 +567,23 @@ void Game::screen(AllScreenStates swap)
 	switch (swap)
 	{
 		case AllScreenStates::In_Game:
+		{
+			score = 0;
+			score_text.setString(std::to_string(score));
+			score_text.setPosition
+			(
+				window.getSize().x - 50 - std::log10(score) * 25,
+				score_text.getGlobalBounds().height / 2
+			);
+
+			spawn();
+
+			if (screen_state != swap)
+			{
+				screen_state = swap;
+			}
+			break;
+		}
 		default:
 		{
 			if (screen_state != swap)

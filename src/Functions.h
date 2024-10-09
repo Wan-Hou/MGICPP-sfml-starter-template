@@ -1,8 +1,10 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
+#include <iostream>
 #include <cmath>
 #include <random>
+#include <string>
 #include <SFML/Graphics.hpp>
 
 enum class AllScreenStates
@@ -11,6 +13,13 @@ enum class AllScreenStates
 	In_Settings,
 	In_Game,
 	In_End
+};
+
+enum class AllGameModes
+{
+	Bird,
+	Border_Control,
+	Mole
 };
 
 void initText(sf::Text& text, const std::string& string, sf::Font& font,

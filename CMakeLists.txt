@@ -22,7 +22,9 @@ FetchContent_MakeAvailable(SFML)    # Makes sure SFML and its dependencies are a
 find_package(SFML 2.6.1 COMPONENTS system window graphics network audio)
 set(SOURCE_FILES src/main.cpp src/Game.cpp src/Game.h 
     src/Functions.cpp    
-    src/Functions.h)  
+    src/Functions.h
+    src/GameObject.cpp
+    src/GameObject.h)  
 # Sets variable SOURCE_FILES to hold names & locations of files that need to be compiled into the application
 add_executable(PlatformerSFML ${SOURCE_FILES})  # Names the application and tells compiler which source files to use
 
